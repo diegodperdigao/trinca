@@ -5,51 +5,51 @@
 @layer base {
   /* ========================================================================
    * LIGHT THEME (default when .light on html)
-   * Paleta clara que mantém a vibe Trinca: fundo bege-creme quente,
-   * cards brancos, primary vermelho forte do brand.
+   * Paleta premium e clean: branco puro, acentos creme sutis só em
+   * superfícies secundárias, vermelho do brand popando forte.
+   * Inspiração: Linear, Vercel, Arc. Nada de cinza chapado.
    * ====================================================================== */
   :root,
   .light {
-    --background: 45 30% 96%;           /* #f8f6f2 — creme quente do guia */
-    --foreground: 120 14% 8%;           /* quase preto verde-frio */
+    --background: 0 0% 100%;            /* branco puro */
+    --foreground: 20 14% 8%;            /* #171512 warm near-black */
 
-    --card: 0 0% 100%;                  /* branco puro */
-    --card-foreground: 120 14% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 120 14% 8%;
+    --popover-foreground: 20 14% 8%;
 
-    --primary: 354 97% 52%;             /* red do brand, levemente mais escuro pra contraste */
+    --primary: 354 97% 48%;             /* brand red mais escuro pra contraste em fundo branco */
     --primary-foreground: 0 0% 100%;
     --primary-glow: 354 97% 62%;
-    --primary-dark: 354 80% 40%;
+    --primary-dark: 354 80% 38%;
 
-    --secondary: 45 20% 92%;            /* creme um pouco mais escuro */
-    --secondary-foreground: 120 14% 8%;
+    --secondary: 40 33% 97%;            /* #f9f7f2 creme sutil só em surfaces secundárias */
+    --secondary-foreground: 20 14% 8%;
 
-    --muted: 45 15% 88%;
-    --muted-foreground: 120 5% 38%;
+    --muted: 40 25% 95%;                /* #f4f1ea */
+    --muted-foreground: 25 8% 40%;      /* #6b625a warm gray (não cinza puro) */
 
-    --accent: 354 97% 58%;
+    --accent: 354 97% 48%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 52%;
+    --destructive: 0 84% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 45 15% 85%;
-    --input: 45 15% 85%;
-    --ring: 354 97% 58%;
+    --border: 40 22% 90%;               /* #eae4d8 warm light */
+    --input: 40 22% 90%;
+    --ring: 354 97% 52%;
 
     --radius: 0.75rem;
 
-    /* Gradient helpers (redefinidos por tema) */
-    --grad-cta-from: 252 64 83;         /* #fc4053 */
-    --grad-cta-mid: 252 44 65;          /* #fc2c41 */
-    --grad-cta-to: 184 20 37;           /* #b81425 */
+    --grad-cta-from: 252 64 83;
+    --grad-cta-mid: 252 44 65;
+    --grad-cta-to: 184 20 37;
     --grad-card-from: 255 255 255;
-    --grad-card-to: 248 246 242;
+    --grad-card-to: 251 249 245;
     --grad-hero-top: 255 255 255;
-    --grad-hero-bot: 248 246 242;
+    --grad-hero-bot: 251 249 245;
   }
 
   /* ========================================================================
@@ -119,6 +119,21 @@
         transparent 45%
       );
     background-attachment: fixed;
+  }
+
+  .light body {
+    background-image:
+      radial-gradient(
+        circle at 15% 0%,
+        hsl(var(--primary) / 0.06),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 85% 100%,
+        hsl(var(--primary) / 0.05),
+        transparent 40%
+      ),
+      linear-gradient(180deg, transparent 0%, hsl(40 33% 98%) 100%);
   }
 
   ::selection {

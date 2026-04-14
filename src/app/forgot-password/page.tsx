@@ -44,19 +44,43 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="relative min-h-dvh w-full overflow-hidden bg-background">
-      <Particles count={50} />
+      <Particles count={60} />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(to_bottom,hsl(var(--primary)/0.18),transparent)]" />
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-72 bg-[linear-gradient(to_right,hsl(var(--primary)/0.14),transparent)]" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 animate-breathe"
+        style={{
+          background:
+            "radial-gradient(ellipse at center top, hsl(var(--primary) / 0.35), transparent 60%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-0 top-1/2 h-[640px] w-[480px] -translate-y-1/2 animate-breathe opacity-70"
+        style={{
+          animationDelay: "1.5s",
+          background:
+            "radial-gradient(ellipse at left center, hsl(var(--primary) / 0.28), transparent 55%)",
+        }}
+      />
 
-      <div className="absolute right-4 top-4 z-20">
+      <div className="absolute right-4 top-4 z-20 animate-fade-in-down">
         <ThemeToggle />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-6 py-10">
-        <Logo size="lg" className="mb-10 animate-fade-in" />
+        <div className="mb-10 animate-fade-in-down">
+          <Logo size="lg" />
+        </div>
 
-        <div className="w-full rounded-2xl border border-border bg-gradient-card p-6 backdrop-blur md:p-8">
+        <div
+          className="relative w-full animate-fade-in-up overflow-hidden rounded-2xl border border-border bg-gradient-card p-6 shadow-2xl backdrop-blur-xl md:p-8"
+          style={{ animationDelay: "0.2s" }}
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
+          />
           <Link
             href="/login"
             className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"

@@ -54,7 +54,6 @@ function LoginForm() {
       });
 
       if (error) {
-        // Mensagem amigável em PT
         const msg = error.message.toLowerCase();
         if (msg.includes("invalid login credentials")) {
           setError("E-mail ou senha incorretos.");
@@ -75,24 +74,77 @@ function LoginForm() {
 
   return (
     <div className="relative min-h-dvh w-full overflow-hidden bg-background">
-      <Particles count={50} />
+      <Particles count={60} />
 
-      {/* red glow top */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(to_bottom,hsl(var(--primary)/0.18),transparent)]" />
-      {/* red glow left */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-72 bg-[linear-gradient(to_right,hsl(var(--primary)/0.14),transparent)]" />
+      {/* Breathing red glow — topo */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 animate-breathe"
+        style={{
+          background:
+            "radial-gradient(ellipse at center top, hsl(var(--primary) / 0.35), transparent 60%)",
+        }}
+      />
 
-      <div className="absolute right-4 top-4 z-20">
+      {/* Breathing red glow — lateral esquerda */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-0 top-1/2 h-[640px] w-[480px] -translate-y-1/2 animate-breathe opacity-70"
+        style={{
+          animationDelay: "1.5s",
+          background:
+            "radial-gradient(ellipse at left center, hsl(var(--primary) / 0.28), transparent 55%)",
+        }}
+      />
+
+      {/* Rotating faint red ring atrás do card */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 animate-spin-slow opacity-40"
+        style={{
+          background:
+            "conic-gradient(from 0deg, transparent 0%, hsl(var(--primary) / 0.25) 25%, transparent 50%, hsl(var(--primary) / 0.15) 75%, transparent 100%)",
+          maskImage:
+            "radial-gradient(circle, transparent 45%, black 46%, black 52%, transparent 53%)",
+          WebkitMaskImage:
+            "radial-gradient(circle, transparent 45%, black 46%, black 52%, transparent 53%)",
+        }}
+      />
+
+      <div className="absolute right-4 top-4 z-20 animate-fade-in-down" style={{ animationDelay: "0.4s" }}>
         <ThemeToggle />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-6 py-10">
-        <Logo size="lg" className="mb-10 animate-fade-in" />
+        <div
+          className="mb-10 animate-fade-in-down"
+          style={{ animationDelay: "0.05s" }}
+        >
+          <Logo size="lg" />
+        </div>
 
-        <div className="w-full rounded-2xl border border-border bg-gradient-card p-6 backdrop-blur md:p-8">
+        <div
+          className="relative w-full animate-fade-in-up overflow-hidden rounded-2xl border border-border bg-gradient-card p-6 shadow-2xl backdrop-blur-xl md:p-8"
+          style={{ animationDelay: "0.25s" }}
+        >
+          {/* Gradient border shimmer on top edge */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
+          />
+
           <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
             Acesse o{" "}
-            <span className="bg-gradient-to-r from-[#fc4053] to-[#b81425] bg-clip-text text-transparent">
+            <span
+              className="inline-block bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg, #fc4053 0%, #f21828 25%, #fc4053 50%, #f21828 75%, #b81425 100%)",
+                backgroundSize: "200% 100%",
+                animation: "text-shimmer 4s ease-in-out infinite",
+                WebkitBackgroundClip: "text",
+              }}
+            >
               painel
             </span>
           </h1>
@@ -101,7 +153,10 @@ function LoginForm() {
           </p>
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
-            <div>
+            <div
+              className="animate-fade-in-up"
+              style={{ animationDelay: "0.45s" }}
+            >
               <label
                 htmlFor="email"
                 className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
@@ -120,7 +175,10 @@ function LoginForm() {
               />
             </div>
 
-            <div>
+            <div
+              className="animate-fade-in-up"
+              style={{ animationDelay: "0.55s" }}
+            >
               <div className="flex items-center justify-between">
                 <label
                   htmlFor="password"
@@ -130,7 +188,7 @@ function LoginForm() {
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-[11px] font-medium text-primary hover:underline"
+                  className="text-[11px] font-medium text-primary transition hover:underline"
                 >
                   Esqueci minha senha
                 </Link>
@@ -149,8 +207,10 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1.5 text-muted-foreground hover:text-foreground"
+                  aria-label={
+                    showPassword ? "Ocultar senha" : "Mostrar senha"
+                  }
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1.5 text-muted-foreground transition hover:text-foreground"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -162,22 +222,30 @@ function LoginForm() {
             </div>
 
             {error && (
-              <p className="rounded-md border border-red-500/30 bg-red-500/5 px-3 py-2 text-xs text-red-300">
+              <p className="animate-fade-in rounded-md border border-red-500/30 bg-red-500/5 px-3 py-2 text-xs text-red-400">
                 {error}
               </p>
             )}
 
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full animate-glow-pulse"
-              disabled={pending}
+            <div
+              className="animate-fade-in-up"
+              style={{ animationDelay: "0.65s" }}
             >
-              {pending ? <Loader2 className="animate-spin" /> : <LogIn />}
-              {pending ? "Entrando..." : "Entrar"}
-            </Button>
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full animate-glow-pulse"
+                disabled={pending}
+              >
+                {pending ? <Loader2 className="animate-spin" /> : <LogIn />}
+                {pending ? "Entrando..." : "Entrar"}
+              </Button>
+            </div>
 
-            <p className="text-center text-[11px] text-muted-foreground">
+            <p
+              className="animate-fade-in-up text-center text-[11px] text-muted-foreground"
+              style={{ animationDelay: "0.75s" }}
+            >
               Acesso restrito. Contate o administrador se não tiver cadastro.
             </p>
           </form>
