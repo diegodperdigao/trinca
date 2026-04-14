@@ -192,6 +192,26 @@
     filter: drop-shadow(0 0 32px rgba(242, 24, 40, 0.55));
   }
 
+  /* =======================================================================
+   * Date/time picker icon — o ícone nativo do <input type="datetime-local">
+   * (e date/time) é preto sobre fundo preto no dark mode, vira invisível.
+   * Inverter com filter resolve — fica branco no dark e continua preto no light.
+   * ======================================================================= */
+  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator,
+  .dark input[type="month"]::-webkit-calendar-picker-indicator,
+  .dark input[type="week"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.9);
+    opacity: 0.75;
+    cursor: pointer;
+  }
+  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+  .dark input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
   /* Gradient text helper */
   .gradient-text {
     background: linear-gradient(
