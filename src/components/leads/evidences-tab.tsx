@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Loader2, Upload, Trash2, FileIcon, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,19 +103,19 @@ function EvidenceCard({
   const [url, setUrl] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  async function fetchUrl() {
-    if (url) return;
+  useEffect(() => {
+    let cancelled = false;
     const supabase = createSupabaseBrowserClient();
-    const { data } = await supabase.storage
+    supabase.storage
       .from("evidences")
-      .createSignedUrl(evidence.storage_path, 60 * 60);
-    if (data?.signedUrl) setUrl(data.signedUrl);
-  }
-
-  if (!url) {
-    // Lazy-fetch signed URL on first render
-    fetchUrl();
-  }
+      .createSignedUrl(evidence.storage_path, 60 * 60)
+      .then(({ data }) => {
+        if (!cancelled && data?.signedUrl) setUrl(data.signedUrl);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [evidence.storage_path]);
 
   return (
     <div className="group relative overflow-hidden rounded-lg border border-border bg-secondary/50">

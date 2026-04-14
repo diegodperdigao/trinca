@@ -56,6 +56,13 @@ export function LeadForm({ lead }: LeadFormProps) {
           await createLead(fd);
         }
       } catch (err: any) {
+        // redirect() do server action propaga como erro — deixa passar
+        if (
+          err?.message === "NEXT_REDIRECT" ||
+          err?.digest?.startsWith?.("NEXT_REDIRECT")
+        ) {
+          throw err;
+        }
         setError(err?.message ?? "Erro ao salvar");
       }
     });
