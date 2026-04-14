@@ -74,26 +74,18 @@ function LoginForm() {
 
   return (
     <div className="relative min-h-dvh w-full overflow-hidden bg-background">
-      {/* Fire base — brasa acumulada na parte de baixo da tela */}
+      {/* Fire base — brasa sutil no rodapé (não exagera) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[70vh]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[45vh]"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 100%, hsl(var(--primary) / 0.35) 0%, hsl(var(--primary) / 0.12) 25%, transparent 60%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 animate-breathe"
-        style={{
-          background:
-            "linear-gradient(to top, hsl(var(--primary) / 0.25), transparent)",
+            "radial-gradient(ellipse at 50% 120%, hsl(var(--primary) / 0.18) 0%, hsl(var(--primary) / 0.05) 35%, transparent 70%)",
         }}
       />
 
       {/* Embers subindo */}
-      <Embers count={70} />
+      <Embers count={60} />
 
       {/* Tema toggle — com label pra não ter como errar */}
       <div

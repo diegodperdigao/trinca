@@ -63,21 +63,13 @@ export default function ResetPasswordPage() {
     <div className="relative min-h-dvh w-full overflow-hidden bg-background">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[70vh]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[45vh]"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 100%, hsl(var(--primary) / 0.35) 0%, hsl(var(--primary) / 0.12) 25%, transparent 60%)",
+            "radial-gradient(ellipse at 50% 120%, hsl(var(--primary) / 0.18) 0%, hsl(var(--primary) / 0.05) 35%, transparent 70%)",
         }}
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 animate-breathe"
-        style={{
-          background:
-            "linear-gradient(to top, hsl(var(--primary) / 0.25), transparent)",
-        }}
-      />
-      <Embers count={70} />
+      <Embers count={60} />
 
       <div className="absolute right-4 top-4 z-20 flex animate-fade-in-down items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1.5 backdrop-blur">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">

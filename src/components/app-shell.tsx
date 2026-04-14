@@ -25,14 +25,8 @@ export function AppShell({
   return (
     <div className="min-h-dvh">
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-border bg-card/60 backdrop-blur-xl md:flex">
-        {/* Red glow at top */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[linear-gradient(to_bottom,hsl(var(--primary)/0.12),transparent)]"
-        />
-
-        <div className="relative flex h-16 items-center border-b border-border px-5">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-border bg-card md:flex dark:bg-card/60 dark:backdrop-blur-xl">
+        <div className="relative flex h-20 items-center border-b border-border px-5">
           <Logo size="md" />
         </div>
 

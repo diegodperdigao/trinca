@@ -65,7 +65,7 @@ const config: Config = {
         "gradient-cta":
           "linear-gradient(135deg, rgb(252,64,83), rgb(252,44,65), rgb(184,20,37))",
         "gradient-card":
-          "linear-gradient(135deg, rgba(14,17,14,0.6), rgba(14,17,14,0.3))",
+          "linear-gradient(135deg, rgb(var(--grad-card-from) / 0.7), rgb(var(--grad-card-to) / 0.4))",
         "gradient-hero":
           "linear-gradient(to top, hsl(var(--background)), rgba(7,9,7,0.4), transparent)",
       },

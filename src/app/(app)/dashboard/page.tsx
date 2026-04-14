@@ -84,14 +84,12 @@ export default async function DashboardPage() {
           value={metrics.meetingsThisWeek}
           hint="Próximos 7 dias"
           icon={Calendar}
-          accent
         />
         <KpiCard
           label="Conversão"
           value={`${conversionPct}%`}
           hint={`${metrics.wonCount} fechados`}
           icon={Target}
-          accent
         />
       </div>
 
