@@ -49,10 +49,10 @@ export default async function ReportPrintPage() {
       {/* Actions bar — hidden on print */}
       <div className="no-print flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
-            Relatório Executivo
+          <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+            <span className="gradient-text">Relatório</span>
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground">
             Formatado para A4. Use <kbd className="rounded bg-secondary px-1 py-0.5 text-[10px]">Ctrl</kbd>
             +<kbd className="rounded bg-secondary px-1 py-0.5 text-[10px]">P</kbd>{" "}
             → salvar como PDF.
