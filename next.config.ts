@@ -16,9 +16,12 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    remotePatterns: supabaseHost
-      ? [{ protocol: "https", hostname: supabaseHost }]
-      : [],
+    remotePatterns: [
+      { protocol: "https", hostname: "i.ibb.co" },
+      ...(supabaseHost
+        ? [{ protocol: "https" as const, hostname: supabaseHost }]
+        : []),
+    ],
   },
 };
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Users, FileText, LogOut } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -22,14 +23,20 @@ export function AppShell({
   const pathname = usePathname();
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="min-h-dvh">
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-border bg-card/40 backdrop-blur md:flex">
-        <div className="flex h-16 items-center border-b border-border px-5">
-          <Logo />
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-border bg-card/60 backdrop-blur-xl md:flex">
+        {/* Red glow at top */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[linear-gradient(to_bottom,hsl(var(--primary)/0.12),transparent)]"
+        />
+
+        <div className="relative flex h-16 items-center border-b border-border px-5">
+          <Logo size="md" />
         </div>
 
-        <nav className="flex-1 space-y-1 p-3">
+        <nav className="relative flex-1 space-y-1 p-3">
           {NAV.map((item) => {
             const Icon = item.icon;
             const active =
@@ -40,28 +47,45 @@ export function AppShell({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-300",
                   active
-                    ? "bg-primary/10 text-primary"
+                    ? "text-white shadow-glow"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
               >
-                <Icon className="h-4 w-4" />
-                {item.label}
                 {active && (
-                  <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(242,24,40,0.8)]" />
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/90 via-primary to-primary-dark"
+                  />
+                )}
+                <Icon
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-300",
+                    active ? "scale-110" : "group-hover:scale-110",
+                  )}
+                />
+                <span className="relative z-10">{item.label}</span>
+                {active && (
+                  <span className="relative z-10 ml-auto h-1.5 w-1.5 animate-pulse rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
                 )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-border p-3">
+        <div className="relative border-t border-border p-3">
           {userEmail && (
-            <div className="mb-2 truncate px-3 text-[11px] text-muted-foreground">
-              {userEmail}
+            <div className="mb-2 flex items-center gap-2 px-3">
+              <div className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-primary to-primary-dark text-[10px] font-bold text-white">
+                {userEmail[0]?.toUpperCase()}
+              </div>
+              <div className="truncate text-[11px] text-muted-foreground">
+                {userEmail}
+              </div>
             </div>
           )}
+          <ThemeToggle variant="inline" />
           <form action="/auth/signout" method="post">
             <button
               type="submit"
@@ -76,20 +100,23 @@ export function AppShell({
 
       {/* Mobile header */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur md:hidden">
-        <Logo />
-        <form action="/auth/signout" method="post">
-          <button
-            type="submit"
-            className="rounded-md p-2 text-muted-foreground hover:text-foreground"
-            aria-label="Sair"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
-        </form>
+        <Logo size="sm" />
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+              aria-label="Sair"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </form>
+        </div>
       </header>
 
       <main className="md:pl-60">
-        <div className="mx-auto w-full max-w-6xl px-4 pb-24 pt-4 md:px-8 md:pt-8">
+        <div className="mx-auto w-full max-w-6xl animate-fade-in px-4 pb-24 pt-4 md:px-8 md:pt-8">
           {children}
         </div>
       </main>
@@ -107,7 +134,7 @@ export function AppShell({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium transition-colors",
+                  "relative flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium transition-colors",
                   active
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground",
@@ -115,6 +142,9 @@ export function AppShell({
               >
                 <Icon className="h-5 w-5" />
                 {item.label}
+                {active && (
+                  <span className="absolute inset-x-6 top-0 h-0.5 rounded-full bg-gradient-to-r from-transparent via-primary to-transparent" />
+                )}
               </Link>
             );
           })}

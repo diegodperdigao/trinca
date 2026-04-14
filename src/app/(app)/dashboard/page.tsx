@@ -42,10 +42,10 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
-            Dashboard
+          <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+            <span className="gradient-text">Dashboard</span>
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground">
             Visão geral da captação — atualizado agora.
           </p>
         </div>
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
               Relatório
             </Link>
           </Button>
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="animate-glow-pulse">
             <Link href="/leads/new">
               <Users />
               Novo Lead
@@ -84,12 +84,14 @@ export default async function DashboardPage() {
           value={metrics.meetingsThisWeek}
           hint="Próximos 7 dias"
           icon={Calendar}
+          accent
         />
         <KpiCard
           label="Conversão"
           value={`${conversionPct}%`}
           hint={`${metrics.wonCount} fechados`}
           icon={Target}
+          accent
         />
       </div>
 

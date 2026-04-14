@@ -3,10 +3,62 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Trinca do iGaming design tokens */
-    --background: 120 14% 3%;
-    --foreground: 45 30% 96%;
+  /* ========================================================================
+   * LIGHT THEME (default when .light on html)
+   * Paleta clara que mantém a vibe Trinca: fundo bege-creme quente,
+   * cards brancos, primary vermelho forte do brand.
+   * ====================================================================== */
+  :root,
+  .light {
+    --background: 45 30% 96%;           /* #f8f6f2 — creme quente do guia */
+    --foreground: 120 14% 8%;           /* quase preto verde-frio */
+
+    --card: 0 0% 100%;                  /* branco puro */
+    --card-foreground: 120 14% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 14% 8%;
+
+    --primary: 354 97% 52%;             /* red do brand, levemente mais escuro pra contraste */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 354 97% 62%;
+    --primary-dark: 354 80% 40%;
+
+    --secondary: 45 20% 92%;            /* creme um pouco mais escuro */
+    --secondary-foreground: 120 14% 8%;
+
+    --muted: 45 15% 88%;
+    --muted-foreground: 120 5% 38%;
+
+    --accent: 354 97% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 52%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 45 15% 85%;
+    --input: 45 15% 85%;
+    --ring: 354 97% 58%;
+
+    --radius: 0.75rem;
+
+    /* Gradient helpers (redefinidos por tema) */
+    --grad-cta-from: 252 64 83;         /* #fc4053 */
+    --grad-cta-mid: 252 44 65;          /* #fc2c41 */
+    --grad-cta-to: 184 20 37;           /* #b81425 */
+    --grad-card-from: 255 255 255;
+    --grad-card-to: 248 246 242;
+    --grad-hero-top: 255 255 255;
+    --grad-hero-bot: 248 246 242;
+  }
+
+  /* ========================================================================
+   * DARK THEME
+   * Paleta original do guia visual institucional.
+   * ====================================================================== */
+  .dark {
+    --background: 120 14% 3%;           /* #070907 */
+    --foreground: 45 30% 96%;           /* #f8f6f2 */
 
     --card: 120 10% 6%;
     --card-foreground: 45 30% 96%;
@@ -14,7 +66,7 @@
     --popover: 120 10% 6%;
     --popover-foreground: 45 30% 96%;
 
-    --primary: 354 97% 58%;
+    --primary: 354 97% 58%;             /* #f21828 */
     --primary-foreground: 0 0% 100%;
     --primary-glow: 354 97% 62%;
     --primary-dark: 354 80% 40%;
@@ -35,7 +87,13 @@
     --input: 120 5% 18%;
     --ring: 354 97% 58%;
 
-    --radius: 0.75rem;
+    --grad-cta-from: 252 64 83;
+    --grad-cta-mid: 252 44 65;
+    --grad-cta-to: 184 20 37;
+    --grad-card-from: 14 17 14;
+    --grad-card-to: 20 24 20;
+    --grad-hero-top: 7 9 7;
+    --grad-hero-bot: 14 17 14;
   }
 
   * {
@@ -49,6 +107,18 @@
 
   body {
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    background-image:
+      radial-gradient(
+        circle at 15% 0%,
+        hsl(var(--primary) / 0.08),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 85% 100%,
+        hsl(var(--primary) / 0.06),
+        transparent 45%
+      );
+    background-attachment: fixed;
   }
 
   ::selection {
@@ -66,6 +136,7 @@
   ::-webkit-scrollbar-thumb {
     background: hsl(var(--muted));
     border-radius: 8px;
+    border: 2px solid hsl(var(--background));
   }
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--primary) / 0.5);
@@ -85,12 +156,51 @@
   }
 
   .card-glass-hover {
-    @apply hover:border-primary/30 hover:shadow-glow;
+    @apply hover:border-primary/40 hover:shadow-glow;
   }
 
   .stage-chip {
     @apply inline-flex items-center gap-1.5 rounded-full border border-border
       bg-secondary px-2.5 py-0.5 text-xs font-medium text-foreground/90;
+  }
+
+  /* Gradient text helper */
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      rgb(var(--grad-cta-from)),
+      rgb(var(--grad-cta-mid)),
+      rgb(var(--grad-cta-to))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Animated shimmer border (for primary surfaces) */
+  .shimmer-border {
+    position: relative;
+    isolation: isolate;
+  }
+  .shimmer-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      120deg,
+      transparent 30%,
+      hsl(var(--primary) / 0.6) 50%,
+      transparent 70%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 }
 
@@ -105,6 +215,10 @@
   body {
     background: white !important;
     color: #0b0b0b !important;
+  }
+
+  body {
+    background-image: none !important;
   }
 
   .no-print {

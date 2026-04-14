@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { Particles } from "@/components/particles";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -77,9 +78,13 @@ function LoginForm() {
       <Particles count={50} />
 
       {/* red glow top */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(to_bottom,rgba(252,44,65,0.18),transparent)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[linear-gradient(to_bottom,hsl(var(--primary)/0.18),transparent)]" />
       {/* red glow left */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-72 bg-[linear-gradient(to_right,rgba(252,44,65,0.14),transparent)]" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-72 bg-[linear-gradient(to_right,hsl(var(--primary)/0.14),transparent)]" />
+
+      <div className="absolute right-4 top-4 z-20">
+        <ThemeToggle />
+      </div>
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-6 py-10">
         <Logo size="lg" className="mb-10 animate-fade-in" />

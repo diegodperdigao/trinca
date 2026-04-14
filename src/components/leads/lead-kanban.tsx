@@ -136,8 +136,8 @@ function KanbanCard({ lead }: { lead: Lead }) {
       {...attributes}
       {...listeners}
       className={cn(
-        "group cursor-grab touch-none rounded-lg border border-border bg-secondary/80 p-3 text-xs shadow-sm transition hover:border-primary/40 active:cursor-grabbing",
-        isDragging && "opacity-60",
+        "group cursor-grab touch-none rounded-lg border border-border bg-gradient-to-br from-secondary/90 to-secondary/60 p-3 text-xs shadow-sm backdrop-blur transition-all duration-300 hover:border-primary/50 hover:shadow-glow active:cursor-grabbing",
+        isDragging && "rotate-2 scale-105 opacity-80 shadow-glow-lg",
       )}
     >
       <div className="flex items-start justify-between gap-2">
