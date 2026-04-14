@@ -26,7 +26,7 @@ export function AppShell({
     <div className="min-h-dvh">
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-border bg-card md:flex dark:bg-card/60 dark:backdrop-blur-xl">
-        <div className="relative flex h-20 items-center border-b border-border px-5">
+        <div className="relative flex h-20 items-center justify-center border-b border-border px-5">
           <Logo size="md" />
         </div>
 
