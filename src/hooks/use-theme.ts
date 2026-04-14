@@ -24,36 +24,63 @@ function applyTheme(theme: Theme) {
 }
 
 /**
- * Theme hook that stays in sync with the inline boot script in
- * app/layout.tsx. Reads current class on mount, persists on change.
+ * Theme hook sincronizado entre QUALQUER consumer do app via
+ * MutationObserver no <html>.
+ *
+ * Bug que isso resolve: cada useState é local ao componente. Se o
+ * ThemeToggle usa useTheme e muda o state dele, o Logo (que também
+ * usa useTheme) não é notificado — o state dele fica congelado no
+ * valor inicial. Com MutationObserver, qualquer mudança na classe
+ * do <html> dispara setTheme em todos os consumers, mantendo tudo
+ * em sincronia.
  */
 export function useTheme() {
-  // Initial state matches whatever the boot script decided.
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const stored = readStoredTheme();
-    const currentClass = document.documentElement.classList.contains("light")
-      ? "light"
-      : "dark";
-    setTheme(stored ?? currentClass);
+    const root = document.documentElement;
+
+    // Sincroniza initial state com a classe atual (setada pelo boot script)
+    const initial: Theme = root.classList.contains("light") ? "light" : "dark";
+    setThemeState(initial);
+
+    // Observa qualquer mudança na classe do html → re-sincroniza state.
+    // Isso garante que todas as instâncias de useTheme() ficam em
+    // sincronia, mesmo sem um Context/Provider compartilhado.
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.type === "attributes" && m.attributeName === "class") {
+          const next: Theme = root.classList.contains("light")
+            ? "light"
+            : "dark";
+          setThemeState(next);
+        }
+      }
+    });
+    observer.observe(root, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
-  const setThemeSafe = useCallback((next: Theme) => {
-    setTheme(next);
+  const setTheme = useCallback((next: Theme) => {
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {
       // ignore
     }
     applyTheme(next);
+    // Não precisa chamar setThemeState — o MutationObserver vai pegar
+    // a mudança da classe e sincronizar.
   }, []);
 
   const toggle = useCallback(() => {
-    setThemeSafe(theme === "dark" ? "light" : "dark");
-  }, [theme, setThemeSafe]);
+    setTheme(theme === "dark" ? "light" : "dark");
+  }, [theme, setTheme]);
 
-  return { theme, setTheme: setThemeSafe, toggle, mounted };
+  return { theme, setTheme, toggle, mounted };
 }

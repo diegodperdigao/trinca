@@ -179,20 +179,15 @@ function triggerSearch() {
 }
 
 function SearchTrigger() {
-  const isMac =
-    typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
-
   return (
     <button
       type="button"
       onClick={triggerSearch}
+      title="Buscar leads (Ctrl/Cmd + K)"
       className="group flex w-full items-center gap-2.5 rounded-lg border border-border bg-secondary/60 px-3 py-2 text-xs text-muted-foreground transition hover:border-primary/40 hover:bg-secondary hover:text-foreground"
     >
       <Search className="h-3.5 w-3.5" />
       <span className="flex-1 text-left">Buscar leads...</span>
-      <kbd className="ml-auto rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] font-semibold">
-        {isMac ? "⌘K" : "Ctrl K"}
-      </kbd>
     </button>
   );
 }
