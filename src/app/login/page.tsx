@@ -4,7 +4,7 @@ import { Suspense, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/logo";
-import { Particles } from "@/components/particles";
+import { Embers } from "@/components/embers";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +22,7 @@ export default function LoginPage() {
 function LoginShell() {
   return (
     <div className="relative min-h-dvh w-full overflow-hidden bg-background">
-      <Particles count={50} />
+      <Embers count={50} />
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-md items-center justify-center px-6">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
@@ -74,44 +74,35 @@ function LoginForm() {
 
   return (
     <div className="relative min-h-dvh w-full overflow-hidden bg-background">
-      <Particles count={60} />
-
-      {/* Breathing red glow — topo */}
+      {/* Fire base — brasa acumulada na parte de baixo da tela */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 animate-breathe"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[70vh]"
         style={{
           background:
-            "radial-gradient(ellipse at center top, hsl(var(--primary) / 0.35), transparent 60%)",
+            "radial-gradient(ellipse at 50% 100%, hsl(var(--primary) / 0.35) 0%, hsl(var(--primary) / 0.12) 25%, transparent 60%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 animate-breathe"
+        style={{
+          background:
+            "linear-gradient(to top, hsl(var(--primary) / 0.25), transparent)",
         }}
       />
 
-      {/* Breathing red glow — lateral esquerda */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-0 top-1/2 h-[640px] w-[480px] -translate-y-1/2 animate-breathe opacity-70"
-        style={{
-          animationDelay: "1.5s",
-          background:
-            "radial-gradient(ellipse at left center, hsl(var(--primary) / 0.28), transparent 55%)",
-        }}
-      />
+      {/* Embers subindo */}
+      <Embers count={70} />
 
-      {/* Rotating faint red ring atrás do card */}
+      {/* Tema toggle — com label pra não ter como errar */}
       <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 animate-spin-slow opacity-40"
-        style={{
-          background:
-            "conic-gradient(from 0deg, transparent 0%, hsl(var(--primary) / 0.25) 25%, transparent 50%, hsl(var(--primary) / 0.15) 75%, transparent 100%)",
-          maskImage:
-            "radial-gradient(circle, transparent 45%, black 46%, black 52%, transparent 53%)",
-          WebkitMaskImage:
-            "radial-gradient(circle, transparent 45%, black 46%, black 52%, transparent 53%)",
-        }}
-      />
-
-      <div className="absolute right-4 top-4 z-20 animate-fade-in-down" style={{ animationDelay: "0.4s" }}>
+        className="absolute right-4 top-4 z-20 flex animate-fade-in-down items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1.5 backdrop-blur"
+        style={{ animationDelay: "0.4s" }}
+      >
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Tema
+        </span>
         <ThemeToggle />
       </div>
 

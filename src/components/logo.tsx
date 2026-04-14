@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -9,45 +8,37 @@ interface LogoProps {
 export const LOGO_URL = "https://i.ibb.co/jvzrDqwM/logo-trinca-1.png";
 export const FAVICON_URL = "https://i.ibb.co/DHfTRTh4/favicon.png";
 
-// Proporção original do PNG oficial: 200 × 87 ≈ 2.3 : 1
-const LOGO_RATIO = 200 / 87;
-
 const SIZES = {
-  sm: 28,
-  md: 40,
-  lg: 72,
+  sm: 32,
+  md: 44,
+  lg: 80,
 } as const;
 
 /**
  * Logo oficial Trinca do iGaming.
- * - `sm` — header mobile (28px alt)
- * - `md` — sidebar desktop (40px alt)
- * - `lg` — login / splash (72px alt)
- *
- * Renderiza diretamente <Image /> sem wrapper pra não bagunçar
- * alinhamento em containers flex.
+ * Usa <img> plano pra ter comportamento previsível em flex containers
+ * (next/image estava gerando espaço extra por causa do wrapper + dimensões
+ * intrínsecas).
  */
 export function Logo({ className, size = "md" }: LogoProps) {
   const height = SIZES[size];
-  const width = Math.round(height * LOGO_RATIO);
 
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src={LOGO_URL}
       alt="Trinca do iGaming"
-      width={width}
       height={height}
-      priority={size === "lg"}
-      unoptimized
       className={cn(
-        "block select-none object-contain",
+        "block w-auto max-w-none select-none",
         size === "lg" &&
-          "drop-shadow-[0_0_32px_rgba(242,24,40,0.45)] dark:drop-shadow-[0_0_32px_rgba(242,24,40,0.55)]",
+          "drop-shadow-[0_0_32px_rgba(242,24,40,0.5)] dark:drop-shadow-[0_0_32px_rgba(242,24,40,0.6)]",
         size === "md" &&
-          "drop-shadow-[0_0_10px_rgba(242,24,40,0.25)] dark:drop-shadow-[0_0_12px_rgba(242,24,40,0.35)]",
+          "drop-shadow-[0_0_10px_rgba(242,24,40,0.3)] dark:drop-shadow-[0_0_14px_rgba(242,24,40,0.4)]",
         className,
       )}
-      style={{ height: `${height}px`, width: "auto" }}
+      style={{ height: `${height}px` }}
+      draggable={false}
     />
   );
 }

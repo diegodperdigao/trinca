@@ -26,17 +26,24 @@ export const metadata: Metadata = {
  * Inline script that reads theme from localStorage and applies the
  * correct class on <html> BEFORE React hydrates — this avoids the
  * "flash of wrong theme" on first paint.
+ *
+ * Default é dark (o :root já tem as vars dark), então o script só
+ * adiciona a classe .light quando o usuário tiver explicitamente
+ * salvo "light" no localStorage.
  */
 const THEME_INIT_SCRIPT = `
 (function() {
   try {
     var stored = localStorage.getItem('trinca.theme');
-    var theme = stored === 'light' || stored === 'dark'
-      ? stored
-      : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark');
-    document.documentElement.classList.remove('light', 'dark');
-    document.documentElement.classList.add(theme);
-    document.documentElement.style.colorScheme = theme;
+    var root = document.documentElement;
+    root.classList.remove('light', 'dark');
+    if (stored === 'light') {
+      root.classList.add('light');
+      root.style.colorScheme = 'light';
+    } else {
+      root.classList.add('dark');
+      root.style.colorScheme = 'dark';
+    }
   } catch (e) {
     document.documentElement.classList.add('dark');
   }

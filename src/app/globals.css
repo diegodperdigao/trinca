@@ -4,58 +4,10 @@
 
 @layer base {
   /* ========================================================================
-   * LIGHT THEME (default when .light on html)
-   * Paleta premium e clean: branco puro, acentos creme sutis só em
-   * superfícies secundárias, vermelho do brand popando forte.
-   * Inspiração: Linear, Vercel, Arc. Nada de cinza chapado.
+   * DARK THEME (default — sem classe ou com .dark explícita)
+   * Paleta institucional da Trinca do iGaming.
    * ====================================================================== */
   :root,
-  .light {
-    --background: 0 0% 100%;            /* branco puro */
-    --foreground: 20 14% 8%;            /* #171512 warm near-black */
-
-    --card: 0 0% 100%;
-    --card-foreground: 20 14% 8%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14% 8%;
-
-    --primary: 354 97% 48%;             /* brand red mais escuro pra contraste em fundo branco */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 354 97% 62%;
-    --primary-dark: 354 80% 38%;
-
-    --secondary: 40 33% 97%;            /* #f9f7f2 creme sutil só em surfaces secundárias */
-    --secondary-foreground: 20 14% 8%;
-
-    --muted: 40 25% 95%;                /* #f4f1ea */
-    --muted-foreground: 25 8% 40%;      /* #6b625a warm gray (não cinza puro) */
-
-    --accent: 354 97% 48%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 48%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 40 22% 90%;               /* #eae4d8 warm light */
-    --input: 40 22% 90%;
-    --ring: 354 97% 52%;
-
-    --radius: 0.75rem;
-
-    --grad-cta-from: 252 64 83;
-    --grad-cta-mid: 252 44 65;
-    --grad-cta-to: 184 20 37;
-    --grad-card-from: 255 255 255;
-    --grad-card-to: 251 249 245;
-    --grad-hero-top: 255 255 255;
-    --grad-hero-bot: 251 249 245;
-  }
-
-  /* ========================================================================
-   * DARK THEME
-   * Paleta original do guia visual institucional.
-   * ====================================================================== */
   .dark {
     --background: 120 14% 3%;           /* #070907 */
     --foreground: 45 30% 96%;           /* #f8f6f2 */
@@ -87,13 +39,53 @@
     --input: 120 5% 18%;
     --ring: 354 97% 58%;
 
+    --radius: 0.75rem;
+
     --grad-cta-from: 252 64 83;
     --grad-cta-mid: 252 44 65;
     --grad-cta-to: 184 20 37;
     --grad-card-from: 14 17 14;
     --grad-card-to: 20 24 20;
-    --grad-hero-top: 7 9 7;
-    --grad-hero-bot: 14 17 14;
+  }
+
+  /* ========================================================================
+   * LIGHT THEME (override quando .light estiver no html)
+   * Fundo branco puro. Sem cinza — acentos warm sutis só em surfaces
+   * secundárias. Primary vermelho escurecido pra contraste cravado.
+   * ====================================================================== */
+  .light {
+    --background: 0 0% 100%;            /* branco puro */
+    --foreground: 20 14% 8%;            /* #171512 near-black warm */
+
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 8%;
+
+    --primary: 354 95% 46%;             /* brand red escurecido pra popar em branco */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 354 97% 56%;
+    --primary-dark: 354 80% 36%;
+
+    --secondary: 36 33% 97%;            /* #faf8f2 creme super sutil */
+    --secondary-foreground: 20 14% 8%;
+
+    --muted: 36 25% 94%;                /* #f2efe7 */
+    --muted-foreground: 25 10% 36%;     /* #62594d warm dark gray */
+
+    --accent: 354 95% 46%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 36 20% 88%;               /* #e5dfd2 warm border */
+    --input: 36 20% 88%;
+    --ring: 354 95% 50%;
+
+    --grad-card-from: 255 255 255;
+    --grad-card-to: 252 250 245;
   }
 
   * {
@@ -216,6 +208,37 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
+  }
+}
+
+/* =========================================================================
+ * Embers animation (fire ashes) — usada no componente <Embers />
+ * Sobe do rodapé até acima do topo, com leve sway lateral e fade in/out.
+ * Respeita --ember-opacity e --ember-sway setadas inline por partícula.
+ * ========================================================================= */
+@keyframes ember-rise {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+  6% {
+    opacity: var(--ember-opacity, 0.8);
+  }
+  30% {
+    transform: translate3d(calc(var(--ember-sway, 0px) * 0.35), -30vh, 0)
+      scale(1);
+  }
+  60% {
+    transform: translate3d(calc(var(--ember-sway, 0px) * 0.85), -60vh, 0)
+      scale(0.95);
+    opacity: var(--ember-opacity, 0.8);
+  }
+  90% {
+    opacity: calc(var(--ember-opacity, 0.8) * 0.3);
+  }
+  100% {
+    transform: translate3d(var(--ember-sway, 0px), -115vh, 0) scale(0.7);
+    opacity: 0;
   }
 }
 

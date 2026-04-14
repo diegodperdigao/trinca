@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/logo";
-import { Particles } from "@/components/particles";
+import { Embers } from "@/components/embers";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,27 +61,28 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="relative min-h-dvh w-full overflow-hidden bg-background">
-      <Particles count={60} />
-
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 animate-breathe"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[70vh]"
         style={{
           background:
-            "radial-gradient(ellipse at center top, hsl(var(--primary) / 0.35), transparent 60%)",
+            "radial-gradient(ellipse at 50% 100%, hsl(var(--primary) / 0.35) 0%, hsl(var(--primary) / 0.12) 25%, transparent 60%)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute left-0 top-1/2 h-[640px] w-[480px] -translate-y-1/2 animate-breathe opacity-70"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 animate-breathe"
         style={{
-          animationDelay: "1.5s",
           background:
-            "radial-gradient(ellipse at left center, hsl(var(--primary) / 0.28), transparent 55%)",
+            "linear-gradient(to top, hsl(var(--primary) / 0.25), transparent)",
         }}
       />
+      <Embers count={70} />
 
-      <div className="absolute right-4 top-4 z-20 animate-fade-in-down">
+      <div className="absolute right-4 top-4 z-20 flex animate-fade-in-down items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1.5 backdrop-blur">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Tema
+        </span>
         <ThemeToggle />
       </div>
 
