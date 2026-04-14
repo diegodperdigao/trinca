@@ -1,3 +1,6 @@
+"use client";
+
+import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -15,28 +18,26 @@ const SIZES = {
 } as const;
 
 /**
- * Logo oficial Trinca do iGaming (PNG hospedada no imgbb).
+ * Logo oficial Trinca do iGaming.
  *
- * Por que essa funciona nos dois temas mesmo sendo um PNG branco:
- * usamos o truque `filter: invert(1) hue-rotate(180deg)` em light mode.
- * - invert(1): inverte todas as cores RGB
- *   · branco (text) → preto ✓
- *   · vermelho (triângulo) → ciano ✗
- * - hue-rotate(180deg): rotaciona o matiz em 180°
- *   · preto → continua preto (grayscale não tem hue)
- *   · ciano → volta pra vermelho ✓
+ * Usa o PNG hospedada no imgbb + truque `filter: invert(1) hue-rotate(180deg)`
+ * em globals.css pra o texto branco virar preto no light mode mantendo o
+ * vermelho do triângulo.
  *
- * Resultado: o texto fica legível em fundo branco E o vermelho do brand
- * fica preservado.
- *
- * As classes .logo-img / .dark .logo-img estão definidas em globals.css
- * pra lidar com a combinação do filter de inversão + drop-shadow no dark.
+ * IMPORTANTE: `key={theme}` força remount do <img> quando o usuário alterna
+ * o tema. Sem isso, alguns browsers (Chrome/Safari) cacheiam o bitmap
+ * renderizado do filter antigo e a logo não repinta corretamente na
+ * transição light → dark, mostrando texto preto invisível sobre fundo preto.
+ * Remontar garante que o filter novo é calculado do zero.
  */
 export function Logo({ className, size = "md" }: LogoProps) {
   const height = SIZES[size];
+  const { theme } = useTheme();
+
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      key={theme}
       src={LOGO_URL}
       alt="Trinca do iGaming"
       className={cn(
