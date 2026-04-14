@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Trinca do iGaming design tokens */
+    --background: 120 14% 3%;
+    --foreground: 45 30% 96%;
+
+    --card: 120 10% 6%;
+    --card-foreground: 45 30% 96%;
+
+    --popover: 120 10% 6%;
+    --popover-foreground: 45 30% 96%;
+
+    --primary: 354 97% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 354 97% 62%;
+    --primary-dark: 354 80% 40%;
+
+    --secondary: 120 10% 10%;
+    --secondary-foreground: 45 30% 96%;
+
+    --muted: 120 5% 15%;
+    --muted-foreground: 30 2% 62%;
+
+    --accent: 354 97% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 120 5% 18%;
+    --input: 120 5% 18%;
+    --ring: 354 97% 58%;
+
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+}
+
+@layer components {
+  .btn-cta {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3
+      font-bold text-white transition-all duration-300
+      bg-gradient-cta shadow-glow hover:-translate-y-0.5 hover:shadow-glow-lg;
+  }
+
+  .card-glass {
+    @apply rounded-xl border border-border bg-gradient-card
+      backdrop-blur transition-all duration-300;
+  }
+
+  .card-glass-hover {
+    @apply hover:border-primary/30 hover:shadow-glow;
+  }
+
+  .stage-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-border
+      bg-secondary px-2.5 py-0.5 text-xs font-medium text-foreground/90;
+  }
+}
+
+/* Print styles for /report/print */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 14mm;
+  }
+
+  html,
+  body {
+    background: white !important;
+    color: #0b0b0b !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-page {
+    break-after: page;
+  }
+
+  .print-surface {
+    background: white !important;
+    color: #0b0b0b !important;
+    border-color: #e4e4e7 !important;
+  }
+
+  .print-muted {
+    color: #52525b !important;
+  }
+
+  .print-primary {
+    color: #f21828 !important;
+  }
+}
