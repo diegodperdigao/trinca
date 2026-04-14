@@ -53,6 +53,29 @@ function parseTags(input: string | null): string[] {
     .slice(0, 20);
 }
 
+/**
+ * Server action que checa se um @instagram já existe.
+ * Chamada pelo lead form pra avisar antes de submeter.
+ * Retorna o lead existente ou null.
+ */
+export async function findLeadByHandle(
+  rawHandle: string,
+): Promise<{ id: string; name: string } | null> {
+  const handle = cleanInstagramHandle(rawHandle);
+  if (!handle) return null;
+
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from("leads")
+    .select("id,name")
+    .ilike("instagram_handle", handle)
+    .is("discarded_at", null)
+    .limit(1)
+    .maybeSingle();
+
+  return (data ?? null) as { id: string; name: string } | null;
+}
+
 export async function createLead(fd: FormData) {
   const parsed = LeadSchema.parse({
     name: fdGet(fd, "name"),
@@ -68,6 +91,23 @@ export async function createLead(fd: FormData) {
   });
 
   const supabase = await createSupabaseServerClient();
+
+  // Check duplicata por @instagram (ignora descartados — você pode
+  // revisitar um lead que foi descartado antes).
+  const cleanHandle = cleanInstagramHandle(parsed.instagram_handle);
+  if (cleanHandle && fd.get("force_duplicate") !== "1") {
+    const { data: existing } = await supabase
+      .from("leads")
+      .select("id,name")
+      .ilike("instagram_handle", cleanHandle)
+      .is("discarded_at", null)
+      .limit(1)
+      .maybeSingle();
+    if (existing) {
+      throw new Error(`DUPE_HANDLE:${existing.id}:${existing.name}`);
+    }
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -76,7 +116,7 @@ export async function createLead(fd: FormData) {
     .from("leads")
     .insert({
       name: parsed.name,
-      instagram_handle: cleanInstagramHandle(parsed.instagram_handle),
+      instagram_handle: cleanHandle,
       category: parsed.category || null,
       phone: parsed.phone || null,
       email: parsed.email || null,

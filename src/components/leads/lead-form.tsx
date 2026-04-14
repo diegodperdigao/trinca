@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, Save } from "lucide-react";
+import { AlertTriangle, ExternalLink, Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,7 @@ import {
 import { STAGES, CATEGORIES, ORIGINS } from "@/lib/stages";
 import type { Lead } from "@/lib/types";
 import { createLead, updateLead } from "@/app/actions/leads";
+import { parseDuplicateHandleError } from "@/lib/utils";
 
 interface LeadFormProps {
   lead?: Lead;
@@ -34,18 +36,26 @@ export function LeadForm({ lead }: LeadFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [duplicate, setDuplicate] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const [stage, setStage] = useState(lead?.stage ?? "prospect");
   const [category, setCategory] = useState(lead?.category ?? "");
   const [origin, setOrigin] = useState(lead?.origin ?? "");
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function submit(forceDuplicate = false) {
     setError(null);
-    const fd = new FormData(e.currentTarget);
+    if (!forceDuplicate) setDuplicate(null);
+
+    const form = document.querySelector<HTMLFormElement>("#lead-form");
+    if (!form) return;
+    const fd = new FormData(form);
     fd.set("stage", stage);
     fd.set("category", category);
     fd.set("origin", origin);
+    if (forceDuplicate) fd.set("force_duplicate", "1");
 
     startTransition(async () => {
       try {
@@ -63,13 +73,23 @@ export function LeadForm({ lead }: LeadFormProps) {
         ) {
           throw err;
         }
+        const dupe = parseDuplicateHandleError(err);
+        if (dupe) {
+          setDuplicate(dupe);
+          return;
+        }
         setError(err?.message ?? "Erro ao salvar");
       }
     });
   }
 
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    submit(false);
+  }
+
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form id="lead-form" onSubmit={onSubmit} className="space-y-5">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="md:col-span-2">
           <Label htmlFor="name">Nome *</Label>
@@ -204,6 +224,40 @@ export function LeadForm({ lead }: LeadFormProps) {
           />
         </div>
       </div>
+
+      {duplicate && (
+        <div className="flex flex-col gap-3 rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 text-sm md:flex-row md:items-center">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-amber-400">
+            <AlertTriangle className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-foreground">
+              Esse @ já está cadastrado
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              O lead &quot;<strong>{duplicate.name}</strong>&quot; já existe
+              com esse Instagram. Abra o existente ou force a criação se
+              for intencional.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 md:flex-nowrap">
+            <Button asChild variant="secondary" size="sm">
+              <Link href={`/leads/${duplicate.id}`}>
+                Abrir lead
+                <ExternalLink className="!size-3" />
+              </Link>
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={pending}
+              onClick={() => submit(true)}
+            >
+              Criar mesmo assim
+            </Button>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="rounded-md border border-red-500/30 bg-red-500/5 p-3 text-xs text-red-300">

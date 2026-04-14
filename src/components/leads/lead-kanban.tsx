@@ -12,11 +12,11 @@ import {
   useDroppable,
   useDraggable,
 } from "@dnd-kit/core";
-import { Instagram, PauseCircle } from "lucide-react";
+import { Clock, Instagram, PauseCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { STAGES, CATEGORY_LABEL } from "@/lib/stages";
 import type { Lead, LeadStage } from "@/lib/types";
-import { cn, instagramUrl, relativeDayLabel } from "@/lib/utils";
+import { cn, daysSince, instagramUrl, relativeDayLabel } from "@/lib/utils";
 import { updateLeadStage } from "@/app/actions/leads";
 
 export function LeadKanban({ leads: initial }: { leads: Lead[] }) {
@@ -179,6 +179,7 @@ function KanbanCard({ lead }: { lead: Lead }) {
         {lead.category && (
           <Badge variant="muted">{CATEGORY_LABEL[lead.category]}</Badge>
         )}
+        <DaysInStageBadge iso={lead.stage_entered_at} />
         {lead.next_action_due_at && (
           <Badge variant="warning">
             {relativeDayLabel(lead.next_action_due_at)}
@@ -186,5 +187,19 @@ function KanbanCard({ lead }: { lead: Lead }) {
         )}
       </div>
     </div>
+  );
+}
+
+function DaysInStageBadge({ iso }: { iso: string }) {
+  const days = daysSince(iso);
+  // Não mostra no dia que entrou — sem valor informativo
+  if (days < 1) return null;
+  const variant =
+    days >= 14 ? "danger" : days >= 7 ? "warning" : "muted";
+  return (
+    <Badge variant={variant} className="gap-1">
+      <Clock className="h-2.5 w-2.5" />
+      {days}d
+    </Badge>
   );
 }

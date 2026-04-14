@@ -33,6 +33,30 @@ export function relativeDayLabel(iso: string | Date) {
   return format(d, "EEE, dd/MM", { locale: ptBR });
 }
 
+/**
+ * Número inteiro de dias completos passados desde uma data/hora.
+ * Usado pra mostrar "X dias parado neste estágio" nas cards do kanban.
+ */
+export function daysSince(iso: string | Date) {
+  const d = typeof iso === "string" ? new Date(iso) : iso;
+  const ms = Date.now() - d.getTime();
+  return Math.max(0, Math.floor(ms / (1000 * 60 * 60 * 24)));
+}
+
+/**
+ * Parseia um erro de duplicata de @instagram. Os server actions lançam
+ * `new Error("DUPE_HANDLE:{id}:{name}")` pra sinalizar — aqui a gente
+ * extrai o id e nome do lead existente.
+ */
+export function parseDuplicateHandleError(
+  err: unknown,
+): null | { id: string; name: string } {
+  if (!(err instanceof Error)) return null;
+  const m = err.message.match(/^DUPE_HANDLE:([^:]+):(.+)$/);
+  if (!m) return null;
+  return { id: m[1], name: m[2] };
+}
+
 /** Parse Instagram handle, strip @ and URL bits. */
 export function cleanInstagramHandle(input: string | null | undefined) {
   if (!input) return null;

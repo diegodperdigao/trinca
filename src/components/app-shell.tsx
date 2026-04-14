@@ -2,9 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, FileText, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  LogOut,
+  Search,
+} from "lucide-react";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { GlobalSearch } from "@/components/global-search";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -24,10 +31,17 @@ export function AppShell({
 
   return (
     <div className="min-h-dvh">
+      {/* Global Cmd+K search — montado uma vez, escuta atalho globalmente */}
+      <GlobalSearch />
+
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-border bg-card md:flex dark:bg-card/60 dark:backdrop-blur-xl">
         <div className="relative flex h-20 items-center justify-center border-b border-border px-5">
           <Logo size="md" />
+        </div>
+
+        <div className="px-3 pt-3">
+          <SearchTrigger />
         </div>
 
         <nav className="relative flex-1 space-y-1 p-3">
@@ -96,6 +110,7 @@ export function AppShell({
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur md:hidden">
         <Logo size="sm" />
         <div className="flex items-center gap-1">
+          <MobileSearchTrigger />
           <ThemeToggle />
           <form action="/auth/signout" method="post">
             <button
@@ -145,5 +160,52 @@ export function AppShell({
         </div>
       </nav>
     </div>
+  );
+}
+
+/**
+ * Dispara o modal Cmd+K programaticamente via KeyboardEvent sintético.
+ * O GlobalSearch tem o listener global, então basta disparar o evento.
+ */
+function triggerSearch() {
+  const event = new KeyboardEvent("keydown", {
+    key: "k",
+    code: "KeyK",
+    metaKey: true,
+    ctrlKey: true,
+    bubbles: true,
+  });
+  window.dispatchEvent(event);
+}
+
+function SearchTrigger() {
+  const isMac =
+    typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
+
+  return (
+    <button
+      type="button"
+      onClick={triggerSearch}
+      className="group flex w-full items-center gap-2.5 rounded-lg border border-border bg-secondary/60 px-3 py-2 text-xs text-muted-foreground transition hover:border-primary/40 hover:bg-secondary hover:text-foreground"
+    >
+      <Search className="h-3.5 w-3.5" />
+      <span className="flex-1 text-left">Buscar leads...</span>
+      <kbd className="ml-auto rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] font-semibold">
+        {isMac ? "⌘K" : "Ctrl K"}
+      </kbd>
+    </button>
+  );
+}
+
+function MobileSearchTrigger() {
+  return (
+    <button
+      type="button"
+      onClick={triggerSearch}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+      aria-label="Buscar leads"
+    >
+      <Search className="h-4 w-4" />
+    </button>
   );
 }

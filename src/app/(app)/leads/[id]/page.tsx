@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Instagram, Mail, Phone, Tag } from "lucide-react";
+import { ArrowLeft, Clock, Instagram, Mail, Phone, Tag } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,7 @@ import { EvidencesTab } from "@/components/leads/evidences-tab";
 import { MeetingsTab } from "@/components/leads/meetings-tab";
 import { HistoryTab } from "@/components/leads/history-tab";
 import { LeadHeaderActions } from "@/components/leads/lead-header-actions";
-import { formatDate, instagramUrl } from "@/lib/utils";
+import { daysSince, formatDate, instagramUrl } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -59,11 +59,12 @@ export default async function LeadDetailPage({
         <CardContent className="space-y-4 pt-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h1 className="truncate text-2xl font-extrabold tracking-tight md:text-3xl">
                   {lead.name}
                 </h1>
                 <Badge variant="primary">{STAGE_LABEL[lead.stage]}</Badge>
+                <StageDuration iso={lead.stage_entered_at} />
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                 {igUrl && (
@@ -196,5 +197,25 @@ export default async function LeadDetailPage({
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function StageDuration({ iso }: { iso: string }) {
+  const days = daysSince(iso);
+  if (days < 1) {
+    return (
+      <Badge variant="muted" className="gap-1">
+        <Clock className="h-3 w-3" />
+        hoje
+      </Badge>
+    );
+  }
+  const variant =
+    days >= 14 ? "danger" : days >= 7 ? "warning" : "muted";
+  return (
+    <Badge variant={variant} className="gap-1">
+      <Clock className="h-3 w-3" />
+      {days} {days === 1 ? "dia" : "dias"} neste estágio
+    </Badge>
   );
 }
