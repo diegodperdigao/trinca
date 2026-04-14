@@ -106,6 +106,7 @@ create table if not exists public.leads (
   phone text,
   email text,
   origin public.lead_origin,
+  current_partnership text,
 
   stage public.lead_stage not null default 'prospect',
   stage_entered_at timestamptz not null default now(),

@@ -175,6 +175,21 @@ export function LeadForm({ lead }: LeadFormProps) {
           </Select>
         </div>
 
+        <div className="md:col-span-2">
+          <Label htmlFor="current_partnership">Parceria atual</Label>
+          <Input
+            id="current_partnership"
+            name="current_partnership"
+            defaultValue={lead?.current_partnership ?? ""}
+            placeholder="Ex: Blaze, Pixbet, Estrela Bet, sem parceria..."
+            className="mt-1.5"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Em qual casa o lead está afiliado no momento — ajuda a entender
+            o contexto competitivo antes da call.
+          </p>
+        </div>
+
         <div>
           <Label>Estágio *</Label>
           <Select value={stage} onValueChange={(v) => setStage(v as any)}>

@@ -12,7 +12,7 @@ import {
   useDroppable,
   useDraggable,
 } from "@dnd-kit/core";
-import { Clock, Instagram, PauseCircle } from "lucide-react";
+import { Building2, Clock, Instagram, PauseCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { STAGES, CATEGORY_LABEL } from "@/lib/stages";
 import type { Lead, LeadStage } from "@/lib/types";
@@ -186,6 +186,16 @@ function KanbanCard({ lead }: { lead: Lead }) {
           </Badge>
         )}
       </div>
+
+      {lead.current_partnership && (
+        <div
+          className="mt-1.5 flex items-center gap-1 truncate text-[10px] text-amber-500 dark:text-amber-300"
+          title={`Atualmente: ${lead.current_partnership}`}
+        >
+          <Building2 className="h-2.5 w-2.5 shrink-0" />
+          <span className="truncate">{lead.current_partnership}</span>
+        </div>
+      )}
     </div>
   );
 }

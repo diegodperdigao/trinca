@@ -44,6 +44,7 @@ export interface Lead {
   phone: string | null;
   email: string | null;
   origin: LeadOrigin | null;
+  current_partnership: string | null;
   stage: LeadStage;
   stage_entered_at: string;
   is_on_hold: boolean;

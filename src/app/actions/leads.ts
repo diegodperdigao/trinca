@@ -21,6 +21,7 @@ const LeadSchema = z.object({
     .enum(["indicacao", "busca_ativa", "evento", "inbound", "outro"])
     .optional()
     .nullable(),
+  current_partnership: z.string().max(200).optional().nullable(),
   stage: z.enum([
     "prospect",
     "dm_sent",
@@ -84,6 +85,7 @@ export async function createLead(fd: FormData) {
     phone: fdGet(fd, "phone"),
     email: fdGet(fd, "email"),
     origin: fdGet(fd, "origin"),
+    current_partnership: fdGet(fd, "current_partnership"),
     stage: fdGet(fd, "stage") ?? "prospect",
     tags: fdGet(fd, "tags"),
     next_action: fdGet(fd, "next_action"),
@@ -121,6 +123,7 @@ export async function createLead(fd: FormData) {
       phone: parsed.phone || null,
       email: parsed.email || null,
       origin: parsed.origin || null,
+      current_partnership: parsed.current_partnership || null,
       stage: parsed.stage,
       tags: parseTags(parsed.tags ?? null),
       next_action: parsed.next_action || null,
@@ -148,6 +151,7 @@ export async function updateLead(id: string, fd: FormData) {
     phone: fdGet(fd, "phone"),
     email: fdGet(fd, "email"),
     origin: fdGet(fd, "origin"),
+    current_partnership: fdGet(fd, "current_partnership"),
     stage: fdGet(fd, "stage") ?? "prospect",
     tags: fdGet(fd, "tags"),
     next_action: fdGet(fd, "next_action"),
@@ -164,6 +168,7 @@ export async function updateLead(id: string, fd: FormData) {
       phone: parsed.phone || null,
       email: parsed.email || null,
       origin: parsed.origin || null,
+      current_partnership: parsed.current_partnership || null,
       stage: parsed.stage,
       tags: parseTags(parsed.tags ?? null),
       next_action: parsed.next_action || null,

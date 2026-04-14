@@ -33,6 +33,7 @@ type LeadResult = Pick<
   | "tags"
   | "email"
   | "phone"
+  | "current_partnership"
 >;
 
 export function GlobalSearch() {
@@ -65,7 +66,7 @@ export function GlobalSearch() {
       const { data } = await supabase
         .from("leads")
         .select(
-          "id,name,instagram_handle,stage,category,is_on_hold,discarded_at,tags,email,phone",
+          "id,name,instagram_handle,stage,category,is_on_hold,discarded_at,tags,email,phone,current_partnership",
         )
         .order("updated_at", { ascending: false })
         .limit(500);
@@ -96,6 +97,7 @@ export function GlobalSearch() {
           l.instagram_handle,
           l.email,
           l.phone,
+          l.current_partnership,
           l.tags?.join(" "),
         ]
           .filter(Boolean)

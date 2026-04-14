@@ -55,6 +55,7 @@ export function LeadsView({ leads }: { leads: Lead[] }) {
           l.instagram_handle,
           l.email,
           l.phone,
+          l.current_partnership,
           l.tags?.join(" "),
         ]
           .filter(Boolean)

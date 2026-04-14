@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock, Instagram, Mail, Phone, Tag } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  Clock,
+  Instagram,
+  Mail,
+  Phone,
+  Tag,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +101,12 @@ export default async function LeadDetailPage({
                   <Badge variant="muted">
                     {CATEGORY_LABEL[lead.category]}
                   </Badge>
+                )}
+                {lead.current_partnership && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/5 px-2 py-0.5 text-[11px] text-amber-500 dark:text-amber-300">
+                    <Building2 className="h-2.5 w-2.5" />
+                    {lead.current_partnership}
+                  </span>
                 )}
                 {lead.origin && (
                   <Badge variant="muted">{ORIGIN_LABEL[lead.origin]}</Badge>
