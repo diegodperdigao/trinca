@@ -1,16 +1,42 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { Suspense, useState, useTransition } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { Particles } from "@/components/particles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { Loader2, MessageCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, LogIn, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginShell />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginShell() {
+  return (
+    <div className="relative min-h-dvh w-full overflow-hidden bg-background">
+      <Particles count={50} />
+      <div className="relative z-10 mx-auto flex min-h-dvh max-w-md items-center justify-center px-6">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    </div>
+  );
+}
+
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") ?? "/dashboard";
+
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -18,24 +44,31 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
 
-    // Whitelist real é checada pela RLS do Supabase (tabela allowed_users).
-    // Aqui só valida formato.
     startTransition(async () => {
       const supabase = createSupabaseBrowserClient();
-      const origin =
-        process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
 
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
-        options: {
-          emailRedirectTo: `${origin}/auth/callback`,
-        },
+        password,
       });
+
       if (error) {
-        setError(error.message);
+        // Mensagem amigável em PT
+        const msg = error.message.toLowerCase();
+        if (msg.includes("invalid login credentials")) {
+          setError("E-mail ou senha incorretos.");
+        } else if (msg.includes("email not confirmed")) {
+          setError(
+            "E-mail ainda não confirmado. Verifique sua caixa de entrada.",
+          );
+        } else {
+          setError(error.message);
+        }
         return;
       }
-      setSent(true);
+
+      router.replace(nextPath);
+      router.refresh();
     });
   }
 
@@ -49,7 +82,7 @@ export default function LoginPage() {
       <div className="pointer-events-none absolute inset-y-0 left-0 w-72 bg-[linear-gradient(to_right,rgba(252,44,65,0.14),transparent)]" />
 
       <div className="relative z-10 mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-6 py-10">
-        <Logo className="mb-10" />
+        <Logo size="lg" className="mb-10 animate-fade-in" />
 
         <div className="w-full rounded-2xl border border-border bg-gradient-card p-6 backdrop-blur md:p-8">
           <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">
@@ -62,63 +95,87 @@ export default function LoginPage() {
             Uso exclusivo de operadores autorizados da Trinca do iGaming.
           </p>
 
-          {sent ? (
-            <div className="mt-6 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
-                <div>
-                  <p className="font-semibold text-foreground">
-                    Link enviado!
-                  </p>
-                  <p className="mt-1 text-muted-foreground">
-                    Abra seu e-mail em <strong>{email}</strong> e clique no
-                    link para entrar. Pode demorar 10–30 segundos.
-                  </p>
-                </div>
+          <form onSubmit={onSubmit} className="mt-6 space-y-4">
+            <div>
+              <label
+                htmlFor="email"
+                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+              >
+                E-mail
+              </label>
+              <Input
+                id="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="voce@exemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1.5"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                >
+                  Senha
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-[11px] font-medium text-primary hover:underline"
+                >
+                  Esqueci minha senha
+                </Link>
+              </div>
+              <div className="relative mt-1.5">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1.5 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
             </div>
-          ) : (
-            <form onSubmit={onSubmit} className="mt-6 space-y-4">
-              <div>
-                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  E-mail
-                </label>
-                <Input
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="voce@exemplo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1.5"
-                />
-              </div>
 
-              {error && (
-                <p className="rounded-md border border-red-500/30 bg-red-500/5 px-3 py-2 text-xs text-red-300">
-                  {error}
-                </p>
-              )}
-
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full animate-glow-pulse"
-                disabled={pending}
-              >
-                {pending ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <MessageCircle />
-                )}
-                {pending ? "Enviando..." : "Enviar link mágico"}
-              </Button>
-
-              <p className="text-center text-[11px] text-muted-foreground">
-                Sem senha. Clicou, entrou.
+            {error && (
+              <p className="rounded-md border border-red-500/30 bg-red-500/5 px-3 py-2 text-xs text-red-300">
+                {error}
               </p>
-            </form>
-          )}
+            )}
+
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full animate-glow-pulse"
+              disabled={pending}
+            >
+              {pending ? <Loader2 className="animate-spin" /> : <LogIn />}
+              {pending ? "Entrando..." : "Entrar"}
+            </Button>
+
+            <p className="text-center text-[11px] text-muted-foreground">
+              Acesso restrito. Contate o administrador se não tiver cadastro.
+            </p>
+          </form>
         </div>
       </div>
     </div>

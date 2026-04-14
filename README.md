@@ -13,7 +13,7 @@ Uso privado e confidencial.
 - **Descarte** categorizado + comentário livre + recuperação
 - **Stand by** (pausa sem perder o lead)
 - **Relatório executivo** formatado A4 → Ctrl+P → PDF
-- **Magic link** auth com whitelist por e-mail
+- **Auth por e-mail + senha** com whitelist por e-mail e fluxo de reset
 - **Mobile-first** responsive (bottom nav mobile, sidebar desktop)
 
 ## Design

@@ -40,11 +40,14 @@ Tudo usa plano gratuito.
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
    - **anon / public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-### 1.3. Configurar autenticação
+### 1.3. Configurar autenticação (e-mail + senha)
 
 10. Menu → **Authentication** → **Providers** → **Email**.
-    - Certifique-se de que **Email** está ativado.
-    - **Confirm email**: pode deixar ligado (o magic link já serve como confirmação).
+    - **Enable Email provider**: ON
+    - **Enable Sign Ups**: **OFF** (importante — assim ninguém se cadastra
+      sozinho; só os usuários que você criar manualmente vão conseguir entrar)
+    - **Confirm email**: pode deixar OFF pra facilitar (ou ON se quiser
+      que o Supabase confirme o e-mail antes do primeiro login)
 11. Menu → **Authentication** → **URL Configuration**.
     - **Site URL**: `https://seudominio.vercel.app` (troque depois do deploy)
     - **Redirect URLs** (adicione todas):
@@ -52,10 +55,30 @@ Tudo usa plano gratuito.
       - `https://seudominio.vercel.app/auth/callback`
       - `https://crm.trincadoigaming.com.br/auth/callback` (se for usar domínio custom)
 
-### 1.4. (Opcional) Customizar o template do e-mail
+### 1.4. Criar os dois usuários com senha
 
-12. Menu → **Authentication** → **Email Templates** → **Magic Link**.
-    - Deixe o idioma em português se quiser. O conteúdo vem em inglês por padrão.
+12. Menu → **Authentication** → **Users** → **Add user** → **Create new user**.
+13. Preencha para **cada um dos dois e-mails** (o seu e o do sócio):
+    - **Email**: o mesmo e-mail que você colocou em `allowed_users` no passo 1.1
+    - **Password**: uma senha temporária forte (pode ser qualquer coisa —
+      o usuário vai trocar depois usando "Esqueci minha senha")
+    - **Auto Confirm User**: ON (evita o passo de confirmação de e-mail)
+14. Confirma que os dois aparecem na lista com status **Confirmed**.
+
+> **Como o usuário define a senha pessoal dele depois**:
+> 1. Abre a URL do CRM em produção
+> 2. Clica em "Esqueci minha senha"
+> 3. Digita o e-mail
+> 4. Recebe link no e-mail → define nova senha → entra
+>
+> Alternativa: você pode compartilhar a senha temporária direto com o
+> sócio e ele troca dentro do app depois. Funciona igual.
+
+### 1.5. (Opcional) Customizar os templates de e-mail
+
+15. Menu → **Authentication** → **Email Templates** → **Reset Password**.
+    - Deixe em português se quiser. O conteúdo vem em inglês por padrão.
+    - Mantenha a variável `{{ .ConfirmationURL }}` no template.
 
 ---
 
@@ -98,8 +121,8 @@ pnpm dev
 
 Abra http://localhost:3000.
 
-Pra testar o fluxo completo, entre com um dos e-mails da whitelist — o Supabase
-vai mandar o magic link de verdade (via SMTP grátis do próprio Supabase).
+Pra testar o fluxo completo, entre com um dos usuários que você criou no
+Supabase Dashboard (passo 1.4), usando e-mail + senha.
 
 ---
 
@@ -133,17 +156,27 @@ vai mandar o magic link de verdade (via SMTP grátis do próprio Supabase).
 ## 6. Primeiro acesso
 
 1. Abra `https://crm.trincadoigaming.com.br` (ou o `.vercel.app`).
-2. Digite seu e-mail (deve estar na whitelist `allowed_users`).
-3. Abra o e-mail, clique no link, tá dentro.
+2. Digite seu e-mail e a **senha temporária** que você definiu no passo 1.4.
+3. (Recomendado) Saia e clique em "Esqueci minha senha" pra receber um link
+   no e-mail e definir uma senha pessoal só sua.
 4. Crie o primeiro lead em **Leads → Novo Lead**.
 
 ---
 
 ## 7. Adicionar / remover usuário autorizado
 
-1. Supabase → **Table editor** → `allowed_users`.
-2. **Insert row** para adicionar, ou deletar a linha pra revogar.
-3. Mudanças são imediatas (RLS confere a cada request).
+**Pra adicionar um novo usuário (3 etapas):**
+1. Supabase → **Authentication → Users → Add user → Create new user**.
+   Preenche e-mail + senha temporária, marca "Auto Confirm User".
+2. Supabase → **Table editor** → `allowed_users` → **Insert row** com o
+   mesmo e-mail (a whitelist é uma camada extra de segurança que a RLS
+   confere em toda query).
+3. Passa a senha temporária pro usuário — ele troca via "Esqueci minha senha".
+
+**Pra revogar acesso:**
+1. Supabase → **Authentication → Users** → delete o usuário.
+2. Supabase → **Table editor** → `allowed_users` → delete a linha.
+3. Qualquer sessão ativa fica inválida na próxima request.
 
 ---
 
@@ -159,10 +192,22 @@ Pra exportar manualmente:
 
 ## 9. Troubleshooting
 
-- **"Invalid login credentials" ou "User not allowed"**
-  → o e-mail não está em `allowed_users`. Adicione pela SQL Editor.
-- **Magic link redireciona pra tela errada**
-  → confira o **Site URL** e **Redirect URLs** no Supabase Auth → URL Configuration.
+- **"E-mail ou senha incorretos"**
+  → confere se o usuário existe em **Authentication → Users** no Supabase
+    Dashboard e se tá com status **Confirmed**. Se esqueceu a senha, usa o
+    fluxo "Esqueci minha senha" na tela de login.
+- **"E-mail ainda não confirmado"**
+  → edita o usuário no Supabase Dashboard e marca como confirmado, OU
+    desliga "Confirm email" em Authentication → Providers → Email.
+- **Login dá sucesso mas volta pra tela de login (loop)**
+  → o e-mail não está em `allowed_users`. Insere a linha correspondente
+    em Table editor → `allowed_users`.
+- **Link de reset de senha vai pra tela errada**
+  → confira o **Site URL** e **Redirect URLs** no Supabase Auth → URL
+    Configuration. Tem que incluir `.../auth/callback`.
+- **Alguém consegue se cadastrar sozinho**
+  → **Enable Sign Ups** precisa estar **OFF** em Authentication → Providers
+    → Email.
 - **Evidências não aparecem**
   → confira se o bucket `evidences` existe e se as policies foram criadas
     (estão no `supabase/schema.sql`).

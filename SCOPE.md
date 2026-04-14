@@ -86,9 +86,10 @@ Editável via constante no código — não tem tela de admin no MVP.
 ## Telas
 
 ### `/login`
-- Magic link Supabase
-- Fundo dark + partículas flutuantes (do guia visual)
-- Logo Trinca + texto curto
+- Autenticação por **e-mail + senha** (Supabase Auth)
+- Link "Esqueci minha senha" → `/forgot-password` → e-mail de reset
+- Tela `/reset-password` pra definir nova senha após clicar no link
+- Fundo dark + partículas flutuantes + logo Trinca grande
 
 ### `/dashboard`
 - **Topo**: 4 KPI cards — Total prospectado, No funil (exclui won/descartado/hold),
