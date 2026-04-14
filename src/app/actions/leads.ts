@@ -112,7 +112,7 @@ export async function createLead(fd: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("leads")
     .insert({
       name: parsed.name,
@@ -128,15 +128,15 @@ export async function createLead(fd: FormData) {
         ? new Date(parsed.next_action_due_at).toISOString()
         : null,
       owner_id: user?.id ?? null,
-    })
-    .select("id")
-    .single();
+    });
 
   if (error) throw new Error(error.message);
 
   revalidatePath("/leads");
   revalidatePath("/dashboard");
-  redirect(`/leads/${data.id}`);
+  // Volta pro kanban depois de criar, pra o Diego continuar operando
+  // sem precisar dar "voltar" do detalhe.
+  redirect("/leads");
 }
 
 export async function updateLead(id: string, fd: FormData) {
