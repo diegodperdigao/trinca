@@ -171,6 +171,27 @@
       bg-secondary px-2.5 py-0.5 text-xs font-medium text-foreground/90;
   }
 
+  /* =======================================================================
+   * LOGO PNG filter trick — faz a logo oficial (branco+vermelho) funcionar
+   * nos dois temas sem precisar de duas versões do arquivo.
+   *
+   * Dark mode: PNG original + drop-shadow vermelho pra glow do brand.
+   * Light mode: filter invert(1) + hue-rotate(180deg) — branco vira preto,
+   *             vermelho continua vermelho (ciano→180°→vermelho).
+   * ======================================================================= */
+  .logo-img {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  .dark .logo-img {
+    filter: drop-shadow(0 0 12px rgba(242, 24, 40, 0.4));
+  }
+  .dark .logo-img.logo-sm {
+    filter: drop-shadow(0 0 8px rgba(242, 24, 40, 0.35));
+  }
+  .dark .logo-img.logo-lg {
+    filter: drop-shadow(0 0 32px rgba(242, 24, 40, 0.55));
+  }
+
   /* Gradient text helper */
   .gradient-text {
     background: linear-gradient(
