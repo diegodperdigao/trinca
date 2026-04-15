@@ -78,7 +78,22 @@ export function LeadForm({ lead }: LeadFormProps) {
           setDuplicate(dupe);
           return;
         }
-        setError(err?.message ?? "Erro ao salvar");
+        // Erro genérico do Next quando o server action crasha em produção.
+        // Provavelmente é a coluna current_partnership faltando no banco —
+        // sugere rodar a migration.
+        const rawMsg = err?.message ?? "";
+        if (
+          rawMsg.includes("Server Components render") ||
+          rawMsg.includes("digest")
+        ) {
+          setError(
+            "Falha ao salvar no banco. Provavelmente a coluna " +
+              "`current_partnership` ainda não foi criada no Supabase. " +
+              "Rode a migration em supabase/migrations/001_current_partnership.sql.",
+          );
+          return;
+        }
+        setError(rawMsg || "Erro ao salvar");
       }
     });
   }
@@ -156,6 +171,21 @@ export function LeadForm({ lead }: LeadFormProps) {
           </Select>
         </div>
 
+        <div className="md:col-span-2">
+          <Label htmlFor="current_partnership">Parceria atual</Label>
+          <Input
+            id="current_partnership"
+            name="current_partnership"
+            defaultValue={lead?.current_partnership ?? ""}
+            placeholder="Ex: Blaze, Pixbet, Estrela Bet, sem parceria..."
+            className="mt-1.5"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Em qual casa o lead está afiliado no momento — ajuda a entender
+            o contexto competitivo antes da call.
+          </p>
+        </div>
+
         <div>
           <Label>Origem</Label>
           <Select
@@ -173,21 +203,6 @@ export function LeadForm({ lead }: LeadFormProps) {
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        <div className="md:col-span-2">
-          <Label htmlFor="current_partnership">Parceria atual</Label>
-          <Input
-            id="current_partnership"
-            name="current_partnership"
-            defaultValue={lead?.current_partnership ?? ""}
-            placeholder="Ex: Blaze, Pixbet, Estrela Bet, sem parceria..."
-            className="mt-1.5"
-          />
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Em qual casa o lead está afiliado no momento — ajuda a entender
-            o contexto competitivo antes da call.
-          </p>
         </div>
 
         <div>
