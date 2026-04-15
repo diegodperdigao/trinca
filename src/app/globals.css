@@ -288,19 +288,38 @@
 
 /* Print styles for /report/print */
 @media print {
+  /* Margem 0 no @page + padding interno com faixa branca no topo é o
+   * truque pra mascarar o cabeçalho/rodapé automático que o Chrome injeta
+   * (URL, data, número da página). Eles ficam por trás da nossa surface
+   * branca opaca e somem visualmente no PDF. */
   @page {
     size: A4;
-    margin: 16mm 14mm;
+    margin: 0;
   }
 
   html,
   body {
     background: white !important;
     color: #0b0b0b !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   body {
     background-image: none !important;
+  }
+
+  /* Reset do shell — o sidebar fica oculto em print, mas o main mantém
+   * padding-left e o container interno aplica padding/max-width. Zera tudo
+   * pra surface ocupar a página inteira. */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  main > div {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
   }
 
   .no-print {
@@ -314,7 +333,13 @@
   .print-surface {
     background: white !important;
     color: #0b0b0b !important;
-    border-color: #e4e4e7 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    /* Topo grande mascara a faixa de data/URL do Chrome; laterais e base
+     * dão respiro tipo margem A4 padrão. */
+    padding: 22mm 14mm 18mm !important;
+    margin: 0 !important;
+    min-height: 100vh;
   }
 
   .print-muted {
@@ -323,5 +348,13 @@
 
   .print-primary {
     color: #f21828 !important;
+  }
+
+  /* Logo sempre no filtro light (preto + vermelho) quando imprimindo,
+   * mesmo se o usuário estiver com o tema dark ativo. Sem isso, a logo
+   * fica branca em fundo branco no PDF. */
+  .logo-img,
+  .dark .logo-img {
+    filter: invert(1) hue-rotate(180deg) !important;
   }
 }

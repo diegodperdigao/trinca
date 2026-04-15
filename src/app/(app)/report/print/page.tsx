@@ -1,10 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { PrintButton } from "@/components/print-button";
-import {
-  getDashboardMetrics,
-  getLeads,
-  getUpcomingMeetings,
-} from "@/lib/queries";
+import { ReportRangeFilter } from "@/components/report-range-filter";
+import { getLeads } from "@/lib/queries";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   STAGES,
   STAGE_LABEL,
@@ -12,23 +10,117 @@ import {
   ORIGIN_LABEL,
   DISCARD_REASON_LABEL,
 } from "@/lib/stages";
-import { Logo } from "@/components/logo";
 import { formatDate, formatDateTime } from "@/lib/utils";
+import type { LeadStage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-export default async function ReportPrintPage() {
-  const [metrics, leads, meetings] = await Promise.all([
-    getDashboardMetrics(),
-    getLeads(),
-    getUpcomingMeetings(50),
-  ]);
+type Range = "day" | "week" | "month" | "all";
 
+const RANGE_LABEL: Record<Range, string> = {
+  day: "Hoje",
+  week: "Últimos 7 dias",
+  month: "Últimos 30 dias",
+  all: "Todo o período",
+};
+
+/**
+ * Calcula o início do range em hora local (00:00). Retorna `null` para
+ * "all" — sem corte temporal.
+ */
+function rangeStart(range: Range): Date | null {
   const now = new Date();
-  const conversionPct = (metrics.conversionRate * 100).toFixed(1);
+  const d = new Date(now);
+  d.setHours(0, 0, 0, 0);
+  if (range === "day") return d;
+  if (range === "week") {
+    d.setDate(d.getDate() - 6);
+    return d;
+  }
+  if (range === "month") {
+    d.setDate(d.getDate() - 29);
+    return d;
+  }
+  return null;
+}
 
-  // funnel conversion between stages
-  const stageCounts = metrics.stageCounts;
+function rangeEnd(range: Range): Date | null {
+  if (range === "all") return null;
+  const d = new Date();
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+
+export default async function ReportPrintPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>;
+}) {
+  const sp = await searchParams;
+  const range: Range = (
+    ["day", "week", "month", "all"].includes(sp.range ?? "")
+      ? (sp.range as Range)
+      : "month"
+  );
+  const start = rangeStart(range);
+  const end = rangeEnd(range);
+
+  // Filtra leads pelo created_at dentro do range selecionado
+  const allLeads = await getLeads();
+  const leads = start
+    ? allLeads.filter((l) => {
+        const t = new Date(l.created_at).getTime();
+        return t >= start.getTime() && (!end || t <= end.getTime());
+      })
+    : allLeads;
+
+  // Reuniões dentro do range. Pra "all" mostra próximas 50 (futuras).
+  const supabase = await createSupabaseServerClient();
+  let meetingsQuery = supabase
+    .from("lead_meetings")
+    .select("*, leads!inner(name,instagram_handle)")
+    .order("starts_at", { ascending: true })
+    .limit(50);
+  if (start && end) {
+    meetingsQuery = meetingsQuery
+      .gte("starts_at", start.toISOString())
+      .lte("starts_at", end.toISOString());
+  } else {
+    meetingsQuery = meetingsQuery.gte(
+      "starts_at",
+      new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+    );
+  }
+  const { data: meetingsRaw } = await meetingsQuery;
+  const meetings = (meetingsRaw ?? []).map((row: any) => ({
+    ...row,
+    lead_name: row.leads?.name,
+    instagram_handle: row.leads?.instagram_handle,
+  }));
+
+  // Métricas computadas a partir dos leads filtrados
+  const stageCounts = STAGES.reduce<Record<LeadStage, number>>(
+    (acc, s) => ({ ...acc, [s.id]: 0 }),
+    {} as Record<LeadStage, number>,
+  );
+  let wonCount = 0;
+  let discardedCount = 0;
+  for (const l of leads) {
+    if (l.discarded_at) {
+      discardedCount++;
+      continue;
+    }
+    stageCounts[l.stage]++;
+    if (l.stage === "won") wonCount++;
+  }
+  const totalProspected = leads.length;
+  const inFunnel = leads.filter(
+    (l) => !l.discarded_at && !l.is_on_hold && l.stage !== "won",
+  ).length;
+  const conversionRate =
+    totalProspected > 0 ? wonCount / totalProspected : 0;
+  const conversionPct = (conversionRate * 100).toFixed(1);
+
   const top = STAGES[0];
   const total = stageCounts[top.id] || 1;
   const maxStage = Math.max(1, ...STAGES.map((s) => stageCounts[s.id] ?? 0));
@@ -44,52 +136,51 @@ export default async function ReportPrintPage() {
       byDiscard[l.discard_reason] = (byDiscard[l.discard_reason] ?? 0) + 1;
   }
 
+  const periodLabel = start
+    ? `${formatDate(start)} — ${formatDate(end ?? new Date())}`
+    : "Histórico completo";
+
   return (
     <div className="mx-auto max-w-4xl space-y-6 print:max-w-none">
       {/* Actions bar — hidden on print */}
-      <div className="no-print flex items-center justify-between">
+      <div className="no-print flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
             <span className="gradient-text">Relatório</span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Formatado para A4. Use <kbd className="rounded bg-secondary px-1 py-0.5 text-[10px]">Ctrl</kbd>
-            +<kbd className="rounded bg-secondary px-1 py-0.5 text-[10px]">P</kbd>{" "}
+            Período: <strong className="text-foreground">{RANGE_LABEL[range]}</strong>{" "}
+            · Use{" "}
+            <kbd className="rounded bg-secondary px-1 py-0.5 text-[10px]">Ctrl</kbd>+
+            <kbd className="rounded bg-secondary px-1 py-0.5 text-[10px]">P</kbd>{" "}
             → salvar como PDF.
           </p>
         </div>
-        <PrintButton />
+        <div className="flex flex-wrap items-center gap-2">
+          <ReportRangeFilter current={range} />
+          <PrintButton />
+        </div>
       </div>
 
       {/* === REPORT SURFACE === */}
-      <div className="print-surface rounded-xl border border-border bg-card p-8 print:rounded-none print:border-0 print:p-0">
-        <header className="flex items-start justify-between border-b border-border pb-4 print-surface">
-          <Logo />
-          <div className="text-right">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground print-muted">
-              Relatório de Prospecção
-            </div>
-            <div className="text-sm font-bold text-foreground">
-              {formatDate(now, "MMMM 'de' yyyy")}
-            </div>
-            <div className="text-[10px] text-muted-foreground print-muted">
-              Gerado em {formatDateTime(now)}
-            </div>
-          </div>
-        </header>
+      <div className="print-surface rounded-xl border border-border bg-card p-8 print:rounded-none print:border-0">
+        {/* Linha mínima identificando o período. Sem header verboso. */}
+        <div className="mb-6 flex items-baseline justify-between gap-4 text-[11px] uppercase tracking-wider text-muted-foreground print-muted">
+          <span className="font-semibold">
+            Relatório · {RANGE_LABEL[range]}
+          </span>
+          <span>{periodLabel}</span>
+        </div>
 
         {/* KPI grid */}
-        <section className="mt-6 grid grid-cols-4 gap-4">
-          <KpiPrint label="Prospectados" value={metrics.totalProspected} />
-          <KpiPrint label="No funil" value={metrics.inFunnel} />
-          <KpiPrint
-            label="Reuniões/semana"
-            value={metrics.meetingsThisWeek}
-          />
+        <section className="grid grid-cols-4 gap-4">
+          <KpiPrint label="Prospectados" value={totalProspected} />
+          <KpiPrint label="No funil" value={inFunnel} />
+          <KpiPrint label="Reuniões" value={meetings.length} />
           <KpiPrint
             label="Conversão"
             value={`${conversionPct}%`}
-            hint={`${metrics.wonCount} fechados`}
+            hint={`${wonCount} fechados`}
           />
         </section>
 
@@ -157,13 +248,13 @@ export default async function ReportPrintPage() {
           />
         </section>
 
-        {/* Reuniões da semana */}
+        {/* Reuniões */}
         <section className="mt-8">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground print-muted">
-            Próximas Reuniões
+            {range === "all" ? "Próximas Reuniões" : "Reuniões no período"}
           </h2>
           {meetings.length === 0 ? (
-            <p className="text-xs text-muted-foreground">Sem reuniões agendadas.</p>
+            <p className="text-xs text-muted-foreground">Sem reuniões no período.</p>
           ) : (
             <table className="w-full text-[11px]">
               <thead>
@@ -232,10 +323,6 @@ export default async function ReportPrintPage() {
             </tbody>
           </table>
         </section>
-
-        <footer className="mt-8 border-t border-border pt-4 text-center text-[10px] text-muted-foreground print-muted">
-          Relatório confidencial — uso interno Trinca do iGaming
-        </footer>
       </div>
     </div>
   );
